@@ -16,6 +16,7 @@ import Body from "./components/Body/Body";
 import Logout from './components/Auth/Logout';
 import BrowseExamples from "./components/BrowseExamples/BrowseExamples";
 import VisualEditor from "./components/VisualEditor/VisualEditor";
+import SkillListing from "./SkillPage/SkillListing";
 injectTapEventPlugin();
 
 class App extends React.Component {
@@ -36,6 +37,7 @@ class App extends React.Component {
                         <Route path="/browseExamples" component={BrowseExamples} />
                         <Route path="/browseSkill" component={BrowseSkill}/>
                         <Route path="/visualEditor" component={VisualEditor}/>
+                        <Route path="/skillPage" component={SkillListing}/>
                         <Route path="/" component={BrowseSkill} />
                         <Route exact path="/logout" component={Logout} />
                         <Route component={NotFound} />
