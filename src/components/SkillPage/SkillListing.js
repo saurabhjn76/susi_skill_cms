@@ -1,5 +1,7 @@
 import React from 'react';
 import AceEditor from 'react-ace';
+import {Card, CardHeader, CardText} from 'material-ui/Card';
+import {Icon, notification} from 'antd';
 import 'brace/mode/markdown';
 import 'brace/theme/github';
 import 'brace/theme/monokai';
@@ -21,7 +23,7 @@ export default class SkillListing extends React.Component {
         super(props);
 
         this.state = {
-            code:"// code", fontSizeCode:14, editorTheme:"github"
+            code:"// code", fontSizeCode:14, editorTheme:"github",test : []
         };
 
     }
@@ -53,6 +55,63 @@ export default class SkillListing extends React.Component {
                 self.updateCode(data.text)
             }
         });
+        url = this.props.location.state.url;
+        url = url.toString()
+        url =  url.replace("getSkillList","getDescriptionSkill");
+        console.log(url);
+        self = this;
+        $.ajax({
+            url: url,
+            jsonpCallback: 'pxcd',
+            dataType: 'jsonp',
+            jsonp: 'callback',
+            crossDomain: true,
+            success: function(data) {
+                // data = data.examples;
+                let keys = Object.keys(data.descriptions);
+                if(keys.length===0){
+                    notification.open({
+                        message: 'Error Processing your Request',
+                        description: 'Error in processing the request. Please try with some other skill',
+                        icon: <Icon type="close-circle" style={{ color: '#f44336' }} />,
+                    });
+                }
+                let test = keys.map((el, i) => {
+                    return (<li style={styles.liStyle} key={i}>
+                        <Card>
+                            <CardHeader
+                                title={el.match(/\/([\w]*)\.[\w]{1,5}$/)[1]}
+                                subtitle={el}
+                                actAsExpander={true}
+                                showExpandableButton={true}
+                            />
+
+                            <CardText expandable={true}>
+                                {data.descriptions[el].map((el, i ) => {
+                                    return (<p key={i}>{el}</p>)
+                                })}
+                            </CardText>
+                        </Card>
+                    </li>)
+                });
+
+                self.setState({
+                    test: test
+                })
+
+                console.log(self.state.test);
+
+            },
+            error: function(e) {
+                console.log(e);
+                notification.open({
+                    message: 'Error Processing your Request',
+                    description: 'Error in processing the request. Please try with some other skill',
+                    icon: <Icon type="close-circle" style={{ color: '#f44336' }} />,
+                });
+            }
+
+        });
     };
 
     updateCode = (newCode) => {
@@ -66,6 +125,19 @@ export default class SkillListing extends React.Component {
     render() {
         return (
             <div style={styles.home}>
+            <div>
+                <h1>{this.props.location.state.name.replace(".txt","")}</h1>
+                <div style={{marginTop:"20px",   marginBottom: "40px",
+                    textAlign: "justify",
+                    fontSize: "0.1px", width: "100%"}}>
+
+                    <ul id="Grid">
+                        {this.state.test}
+                    </ul>
+
+                </div>
+            </div>
+            <div >
                 <AceEditor
                     mode="markdown"
                     theme={this.state.editorTheme}
@@ -77,6 +149,7 @@ export default class SkillListing extends React.Component {
                     editorProps={{$blockScrolling: true}}
                 />
 
+            </div>
             </div>
 
         );
